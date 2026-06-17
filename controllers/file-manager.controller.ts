@@ -6,7 +6,7 @@ type UploadRequest = Request & {
   files?: unknown;
 };
 
-export const uploadFile = (req: UploadRequest, res: Response) => {
+export const uploadFile = (req: Request, res: Response) => {
   try {
     const file = req.files as Express.Multer.File[];
 
