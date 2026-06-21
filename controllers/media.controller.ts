@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 
-export const getMedia = (req: Request, res: Response) => {
+export const GETgetMedia = (req: Request, res: Response) => {
   const filename = req.params.filename;
   const type = req.query.type;
 

@@ -5,7 +5,7 @@ const router = Router();
 
 router.get(
   '/:filename', 
-  mediaController.getMedia
+  mediaController.GETgetMedia
 );
 
 export default router;

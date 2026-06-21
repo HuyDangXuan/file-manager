@@ -9,7 +9,13 @@ const router = Router();
 router.post(
   '/upload', 
   upload.array('files'), 
-  fileManagerController.uploadFile
+  fileManagerController.POSTuploadFile
+);
+
+router.patch(
+  '/change-file-name',
+  upload.none(),
+  fileManagerController.PATCHchangeFileName
 );
 
 export default router;
