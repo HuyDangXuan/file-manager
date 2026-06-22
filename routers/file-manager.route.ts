@@ -18,4 +18,9 @@ router.patch(
   fileManagerController.PATCHchangeFileName
 );
 
+router.patch(
+  '/delete-file',
+  upload.none(),
+  fileManagerController.PATCHdeleteFile
+);
 export default router;

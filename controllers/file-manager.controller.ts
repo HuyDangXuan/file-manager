@@ -91,3 +91,47 @@ export const PATCHchangeFileName = (req: Request, res: Response) => {
     });
   }
 };
+
+export const PATCHdeleteFile = (req: Request, res: Response) => {
+  try {
+    const { folder, fileName } = req.body;
+
+    if (!folder || !fileName) {
+      return res.json({
+        code: "error",
+        message: "Thiếu thông tin cần thiết",
+      });
+    }
+
+    const cleanFolder = folder.replace("/", "");
+    const mediaDir = path.join(__dirname, '..', cleanFolder);
+    const filePath = path.join(mediaDir, fileName);
+
+    if (!fs.existsSync(filePath)) {
+      return res.json({
+        code: "error",
+        message: "File không tồn tại",
+      });
+    }
+
+    try {
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      return res.json({
+        code: "error",
+        message: "Xóa file thất bại",
+      });
+    }
+
+    res.json({
+      code: "success",
+      message: "Xóa file thành công",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Lỗi hệ thống!",
+    });
+  }
+};
