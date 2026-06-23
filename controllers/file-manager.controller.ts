@@ -140,7 +140,7 @@ export const PATCHdeleteFile = (req: Request, res: Response) => {
 
 export const POSTcreateFolder = (req: Request, res: Response) => {
   try {
-    const { folderName } = req.body;
+    const { folderName, folderPath } = req.body;
 
     if (!folderName) {
       return res.json({
@@ -150,16 +150,16 @@ export const POSTcreateFolder = (req: Request, res: Response) => {
     }
 
     const mediaRoot = path.join(__dirname, '..', 'media');
-    const folderPath = path.join(mediaRoot, folderName);
+    const targetPath = path.join(mediaRoot, folderPath || '', folderName);
 
-    if (fs.existsSync(folderPath)) {
+    if (fs.existsSync(targetPath)) {
       return res.json({
         code: "error",
         message: "Thư mục đã tồn tại",
       });
     }
 
-    fs.mkdirSync(folderPath, { recursive: true });
+    fs.mkdirSync(targetPath, { recursive: true });
     res.json({
       code: "success",
       message: "Tạo thư mục thành công",
@@ -175,11 +175,24 @@ export const POSTcreateFolder = (req: Request, res: Response) => {
 
 export const GETlistFolder = (req: Request, res: Response) => {
   try {
-    const mediaRoot = path.join(__dirname, '..', 'media');
-    const folders = fs.readdirSync(mediaRoot, { withFileTypes: true })
+    let mediaPath = path.join(__dirname, '..', 'media');
+
+    const subFolderPath = `${req.query.folderPath}`;
+
+    if (subFolderPath != "undefined") {
+      mediaPath = path.join(mediaPath, subFolderPath);
+      if (!fs.existsSync(mediaPath)) {
+        return res.json({
+          code: "error",
+          message: "Thư mục không tồn tại",
+        });
+      }
+    }
+
+    const folders = fs.readdirSync(mediaPath, { withFileTypes: true })
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => {
-        const folderPath = path.join(mediaRoot, dirent.name);
+        const folderPath = path.join(mediaPath, dirent.name);
         const stats = fs.statSync(folderPath);
         return {
           name: dirent.name,
