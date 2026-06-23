@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 
+const mediaRoot = path.resolve(process.cwd(), 'media');
+
 type UploadRequest = Request & {
   files?: unknown;
 };
@@ -12,7 +14,7 @@ export const POSTuploadFile = (req: Request, res: Response) => {
 
     const savedLinks: any[] = [];
 
-    const mediaDir = path.join(__dirname, '../media');
+    const mediaDir = mediaRoot;
 
     file.forEach((file) => {
       const fileName = `${Date.now()}-${file.originalname}`;
@@ -52,7 +54,7 @@ export const PATCHchangeFileName = (req: Request, res: Response) => {
     }
 
     const cleanFolder = folder.replace("/", "");
-    const mediaDir = path.join(__dirname, '..', cleanFolder);
+    const mediaDir = path.resolve(mediaRoot, cleanFolder);
     const oldFilePath = path.join(mediaDir, oldFileName);
     const newFilePath = path.join(mediaDir, newFileName);
 
@@ -104,7 +106,7 @@ export const PATCHdeleteFile = (req: Request, res: Response) => {
     }
 
     const cleanFolder = folder.replace("/", "");
-    const mediaDir = path.join(__dirname, '..', cleanFolder);
+    const mediaDir = path.resolve(mediaRoot, cleanFolder);
     const filePath = path.join(mediaDir, fileName);
 
     if (!fs.existsSync(filePath)) {
@@ -135,3 +137,66 @@ export const PATCHdeleteFile = (req: Request, res: Response) => {
     });
   }
 };
+
+export const POSTcreateFolder = (req: Request, res: Response) => {
+  try {
+    const { folderName } = req.body;
+
+    if (!folderName) {
+      return res.json({
+        code: "error",
+        message: "Thiếu thông tin cần thiết",
+      });
+    }
+
+    const mediaRoot = path.join(__dirname, '..', 'media');
+    const folderPath = path.join(mediaRoot, folderName);
+
+    if (fs.existsSync(folderPath)) {
+      return res.json({
+        code: "error",
+        message: "Thư mục đã tồn tại",
+      });
+    }
+
+    fs.mkdirSync(folderPath, { recursive: true });
+    res.json({
+      code: "success",
+      message: "Tạo thư mục thành công",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Lỗi hệ thống!",
+    });
+  }
+}
+
+export const GETlistFolder = (req: Request, res: Response) => {
+  try {
+    const mediaRoot = path.join(__dirname, '..', 'media');
+    const folders = fs.readdirSync(mediaRoot, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => {
+        const folderPath = path.join(mediaRoot, dirent.name);
+        const stats = fs.statSync(folderPath);
+        return {
+          name: dirent.name,
+          createdAt: stats.birthtime,
+        };
+      }).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    res.json({
+      code: "success",
+      message: "Lấy danh sách thư mục thành công",
+      folders: folders,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Lỗi hệ thống!",
+    });
+  }
+}

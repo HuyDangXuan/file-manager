@@ -23,4 +23,16 @@ router.patch(
   upload.none(),
   fileManagerController.PATCHdeleteFile
 );
+
+router.post(
+  '/folder/create',
+  upload.none(),
+  fileManagerController.POSTcreateFolder
+);
+
+router.get(
+  '/folder/list',
+  upload.none(),
+  fileManagerController.GETlistFolder
+);
 export default router;
