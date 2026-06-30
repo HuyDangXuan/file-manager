@@ -5,10 +5,10 @@ import fs from 'fs';
 const mediaRoot = path.resolve(process.cwd(), 'media');
 
 export const GETgetMedia = (req: Request, res: Response) => {
-  const filename = req.params.filename;
+  const subPath = req.params.subPath;
   const type = req.query.type;
 
-  const mediaDir = path.join(mediaRoot, `${filename}`);
+  const mediaDir = path.join(mediaRoot, ...subPath);
 
   if (type === 'download') {
     res.download(mediaDir);

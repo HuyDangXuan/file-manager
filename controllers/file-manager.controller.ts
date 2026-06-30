@@ -14,14 +14,22 @@ export const POSTuploadFile = (req: Request, res: Response) => {
 
     const savedLinks: any[] = [];
 
-    const mediaDir = mediaRoot;
+    let mediaDir = mediaRoot;
+
+    // Thêm folderPath
+    const folderPath = req.body.folderPath;
+    if (folderPath != "null") {
+      mediaDir = path.join(mediaDir, folderPath);
+    }
+
+
 
     file.forEach((file) => {
       const fileName = `${Date.now()}-${file.originalname}`;
       const filePath = path.join(mediaDir, fileName);
       fs.writeFileSync(filePath, file.buffer);
       savedLinks.push({
-        folder: '/media',
+        folder: '/media' + (folderPath != "null" ? `/${folderPath}` : ''),
         filename: fileName,
         mimetype: file.mimetype,
         size: file.size,
@@ -106,7 +114,7 @@ export const PATCHdeleteFile = (req: Request, res: Response) => {
     }
 
     const cleanFolder = folder.replace("/", "");
-    const mediaDir = path.resolve(mediaRoot, cleanFolder);
+    const mediaDir = path.resolve(mediaRoot, '..', cleanFolder);
     const filePath = path.join(mediaDir, fileName);
 
     if (!fs.existsSync(filePath)) {
