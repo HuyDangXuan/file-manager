@@ -221,3 +221,42 @@ export const GETlistFolder = (req: Request, res: Response) => {
     });
   }
 }
+
+export const PATCHdeleteFolder = (req: Request, res: Response) => {
+  try {
+    const { folderPath } = req.body;
+
+    if (!folderPath) {
+      return res.json({
+        code: "error",
+        message: "Thiếu thông tin cần thiết",
+      });
+    }
+
+    // Tạo đường dẫn đến thư mục cần xóa
+    const folderDir = path.join(__dirname, '..', folderPath);
+
+    if (!fs.existsSync(folderDir)) {
+      res.json({
+        code: "error",
+        message: "Thư mục không tồn tại",
+      });
+      return;
+    }
+
+    fs.rmSync(folderDir, { 
+      recursive: true 
+    });
+
+    res.json({
+      code: "success",
+      message: "Xóa thư mục thành công",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Lỗi hệ thống!",
+    });
+  }
+}

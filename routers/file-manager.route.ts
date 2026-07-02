@@ -35,4 +35,11 @@ router.get(
   upload.none(),
   fileManagerController.GETlistFolder
 );
+
+router.patch(
+  '/folder/delete',
+  upload.none(),
+  fileManagerController.PATCHdeleteFolder
+);
+
 export default router;
